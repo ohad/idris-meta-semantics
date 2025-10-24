@@ -16,7 +16,7 @@ authors = "Ohad Kammar"
 depends = mast
 
 -- modules to install
-modules = Idris_meta_semantics
+modules = Syntax
 
 -- main file (i.e. file to load at REPL)
 -- main =

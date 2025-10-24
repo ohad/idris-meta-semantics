@@ -1,4 +1,4 @@
-module Idris_meta_semantics
+module Syntax
 
 import MAST.Core
 import MAST.Presheaf
@@ -22,7 +22,7 @@ data Free : {r : SortingSystemOver a b both} ->
    r.RSortedFamily
    where
   Res : x -|> Free s x
-  Cont : (s $ Free  s x) -|> Free s x
+  Cont : (s $ Free {r} s x) -|> Free {r} s x
 
 (.FreeMap) : {0 r : SortingSystemOver a b both} ->
   (s : (both,a) ====> (both,a)) ->
@@ -53,14 +53,20 @@ sigOp = Cont
   {x,y : r.RSortedFamily} ->
   (x -|> Free {r} s y) -> (Free {r} s x -|> Free {r} s y)
 s.extend map f (Res  i) = f i
-s.extend maprec@(MkRSortedFamilyFunctor map) f (Cont {s} k)
-  = let foo : Free {r} s x ty ctx -> Free {r} s y ty ctx = s.extend maprec f
-          --map {p = ?wut2, q = ?wut1}
-        k' : s (Free s x) ty ctx = k
-        baz : (0 ctx : a.Ctx) -> (0 ty : both) ->
-           Free s x ty ctx -> Free s y ty ctx := \ctx', ty' =>
-              map foo ?wughg
-    in Cont ?wut
+s.extend maprec@(MkRSortedFamilyFunctor map) {x,y} f (Cont {s} k)
+  = Cont (map (s.extend maprec f) k)
 
-test : String
-test = "Hello from Idris2!"
+public export
+record (.RSortedFamilyBiFunctor) (r : SortingSystemOver a b both)
+  (f : r.RSortedFamilyBiFun) where
+  constructor MkRSortedFamilyBiFunctor
+  map : {0 p1,p2, q1,q2 : r.RSortedFamily} ->
+  (p1 -|> p2) -> (q1 -|> q2) ->
+  (f p1 q1 -|> f p2 q2 )
+
+MrgFunctor : {r : SortingSystemOver a b both} ->
+  (s : r.RSortedFamilyBiFun) ->
+  r.RSortedFamilyBiFunctor s ->
+  (Mrg {r} s).RSortedFamilyFunctor
+MrgFunctor s (MkRSortedFamilyBiFunctor bimap) = MkRSortedFamilyFunctor $
+  \f => bimap f f
