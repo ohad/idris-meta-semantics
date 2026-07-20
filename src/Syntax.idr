@@ -8,6 +8,7 @@ import MAST.Modality
 import MAST.Signature
 import MAST
 
+public export
 0
 (.RSortedFamilyBiFun) : (r : SortingSystemOver a b both) -> Type
 r.RSortedFamilyBiFun = r.RSortedFamily -> r.RSortedFamilyFun
