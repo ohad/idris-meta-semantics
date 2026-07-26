@@ -1,9 +1,5 @@
 ||| General definitions related to modelling higher-order behaviours as
 ||| (mixed variance) functors.
-|||
-||| Port of `Behaviour.hs`. The Haskell `MixFunctor` type class becomes an
-||| explicitly-passed dictionary record, following the convention already used
-||| for functors and bifunctors in `Syntax`.
 module Behaviour
 
 import MAST.Core
@@ -18,12 +14,8 @@ import Syntax
 
 public export infixr 3 ~~>
 
-||| The class of mixed-variance functors: contravariant in the first argument,
-||| covariant in the second.
-|||
-||| Haskell's `mx_first`/`mx_second` are class methods with mutually-recursive
-||| defaults; here they are derived operations (`.mxFirst`, `.mxSecond`) taking
-||| the dictionary, since every instance defines `mvmap` anyway.
+||| Mixed-variance functors: contravariant in the first argument, covariant in
+||| the second.
 public export
 record (.RSortedFamilyMixFunctor) (r : SortingSystemOver a b both)
   (f : r.RSortedFamilyBiFun) where
@@ -48,34 +40,18 @@ public export
   (p1 -|> p2) -> (f p2 q -|> f p1 q)
 mix.mxFirst g = mix.mvmap g (\u => u)
 
-||| The Kripke function space: the internal hom of the presheaf category, and
-||| the binder-correct reading of Haskell's `x -> y`.
+||| The Kripke function space, i.e. the internal hom of the presheaf category:
 |||
-||| Unfolding `SortedBox`:
 |||   (x ~~> y) ty ctx  =  {0 dtx : a.Ctx} -> (dtx ~> ctx) -> x ty dtx -> y ty dtx
 |||
-||| i.e. a function that still works in *every extension* of the current
-||| context. MAST's pointwise exponential `(=|>)` is the wrong choice here: a
-||| function value valid only at `ctx` is invalidated the moment it travels
-||| under a binder, so `Beh` built on `(=|>)` cannot model a higher-order
-||| language with binding.
-||| Phrased over `sort`/`bindable` rather than over a `SortingSystemOver`,
-||| matching MAST's own `(=|>)`: an extra `{0 r}` implicit here would be
-||| undetermined at every use site inside `Beh`.
+||| A function that still acts in every extension of the current context, and so
+||| remains valid under a binder.
 public export
 0
 (~~>) : (x, y : sort.SortedFamilyOver bindable) -> sort.SortedFamilyOver bindable
 x ~~> y = SortedBox (x =|> y)
 
 ||| A handy instance of behaviour (mixed variance) functor: B(X,Y) = Y + Y^X.
-|||
-||| NOTE: `Eval` relates `x` and `y` at the *same* sort. That is the right
-||| notion for an untyped object language, but it is NOT the STLC function
-||| space, which sends sort `sigma` to sort `tau` at an arrow type
-||| `sigma => tau`. `SortingSystemOver` supplies only the value/computation
-||| split, not arrow decomposition of sorts, so the typed version cannot be
-||| written at this generality — it belongs with the object language in
-||| `Examples`. See CLAUDE.md.
 public export
 data Beh : {0 r : SortingSystemOver a b both} ->
   (x, y : r.RSortedFamily) ->
@@ -113,18 +89,7 @@ BehMixFunctor = MkRSortedFamilyMixFunctor $ \f, g => \case
   Red  y => Red (g y)
   Eval h => Eval (\ren, u => g (h ren (f u)))
 
-||| The Kripke function space as a behaviour mixed-variance functor (Haskell's
-||| `MixFunctor (->)` instance).
-|||
-||| `f` and `g` are natural transformations, so they act at the extended
-||| context `dtx` without needing any coalgebra structure on `x` or `y`; the
-||| renaming `ren` is simply passed through.
-|||
-||| Use sites must supply `r` explicitly, as `(KripkeExpMixFunctor {r}).mvmap`:
-||| `r.RSortedFamily` unfolds to `both.SortedFamilyOver a`, which never mentions
-||| `r`'s middle parameter, so `r` is not recoverable from the family types.
-||| `BehMixFunctor` and friends do not need this — their `r` is pinned by the
-||| `Beh {r}` / `SepBeh {r} d` index.
+||| Instantiating the Kripke function space as a mixed-variance functor.
 public export
 KripkeExpMixFunctor : {0 r : SortingSystemOver a b both} ->
   r.RSortedFamilyMixFunctor (~~>)
