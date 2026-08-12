@@ -17,6 +17,7 @@ r.RSortedFamilyBiFun = r.RSortedFamily -> r.RSortedFamilyFun
 Mrg : (s : r.RSortedFamilyBiFun) -> (x : r.RSortedFamily) -> r.RSortedFamily
 Mrg s x = s x x
 
+public export
 data Free : {r : SortingSystemOver a b both} ->
    (s : r.RSortedFamilyFun) ->
    (x : r.RSortedFamily) ->

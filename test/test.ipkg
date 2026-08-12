@@ -16,7 +16,9 @@ authors = "Ohad Kammar"
 depends = idris-meta-semantics
 
 -- modules to install
--- modules =
+-- Smoke and Smoke2 build only against a `mast` that exports the
+-- helpers of `MAST.Initiality`; see their headers.
+-- modules = Smoke, Smoke2
 
 -- main file (i.e. file to load at REPL)
 main = Main
