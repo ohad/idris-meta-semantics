@@ -14,6 +14,7 @@ public export
 r.RSortedFamilyBiFun = r.RSortedFamily -> r.RSortedFamilyFun
 
 -- Is this correct?
+public export
 Mrg : (s : r.RSortedFamilyBiFun) -> (x : r.RSortedFamily) -> r.RSortedFamily
 Mrg s x = s x x
 
@@ -38,6 +39,7 @@ s.FreeMap map = MkRSortedFamilyFunctor $ \f => \case
 
 
 
+public export
 0
 Initial : (s : r.RSortedFamilyFun) -> r.RSortedFamily
 Initial s = Free {r} s $ const $ const Void
@@ -49,6 +51,7 @@ sigOp : {0 r : SortingSystemOver a b both} ->
 sigOp = Cont
 
 -- Monad
+public export
 (.extend) : {0 r : SortingSystemOver a b both} ->
   (s : (both,a) ====> (both,a)) ->
   s.RSortedFamilyFunctor ->
@@ -66,6 +69,7 @@ record (.RSortedFamilyBiFunctor) (r : SortingSystemOver a b both)
   (p1 -|> p2) -> (q1 -|> q2) ->
   (f p1 q1 -|> f p2 q2 )
 
+public export
 MrgFunctor : {r : SortingSystemOver a b both} ->
   (s : r.RSortedFamilyBiFun) ->
   r.RSortedFamilyBiFunctor s ->
